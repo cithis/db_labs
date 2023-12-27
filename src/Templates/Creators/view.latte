@@ -1,0 +1,46 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>{$creator->getDisplayName()}</h1>
+    <div class="card mb-3">
+        <div class="card-header">Creator info</div>
+        <div class="card-body">
+            <div class="d-flex align-items-start">
+                <img class="mr-2" src="{$creator->getAvatarUrl()}" />
+                <div class="d-flex flex-column">
+                    <form method="POST">
+                        <p class="m-0"><b>Nickname:</b> <input type="text" name="nickname" value="{$creator->getNickname()}" required /></p>
+                        <p class="m-0"><b>Display name:</b> <input type="text" name="displayName" value="{$creator->getDisplayName()}" required /></p>
+                        <p class="m-0"><b>Avatar URL:</b> <input type="text" name="avatarUrl" value="{$creator->getAvatarUrl()}" placeholder="/ava/amogus.jpeg" required /></p>
+                        <p class="m-0"><b>Banned:</b> <input n:attr="checked: $creator->isBanned()" type="checkbox" name="isBanned" /></p>
+                        <p class="m-0"><b>Actions:</b> <input class="btn btn-primary" type="submit" name="act" value="Save" /> <input class="btn btn-danger" type="submit" name="act" value="Delete" /></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Tiers</div>
+        <form class="px-4 pt-4" action="/tiers/new">
+            <input type="hidden" name="creator" value="{$creator->getNickname()}" />
+            <button class="btn btn-primary">Add new...</button>
+        </form>
+
+        <div class="card-body">
+            <ul class="list-group">
+                <li n:foreach="$tiers as $tier" class="list-group-item d-flex flex-column">
+                    <h5>Tier <a href="/tiers/@{$tier->getUuid()}">{$tier->getTitle()}</a></h5>
+                    <p class="m-0"><b>UUID:</b> {$tier->getUuid()}</p>
+                    <p class="m-0"><b>Price:</b> {$tier->getPrice() ?? 'Free'}</p>
+                    <p class="m-0"><b>Description:</b></p>
+                    <p class="m-0"><i>{$tier->getDescription()}</i></p>
+                    <p class="m-0 mt-2 text-muted"><b>Click the title to edit (or remove) this tier.</b></p>
+                </li>
+            </ul>
+        </div>
+        <div class="card-footer">
+            {include '../paginator.latte', page => $page, size => sizeof($tiers)}
+        </div>
+    </div>
+{/block}

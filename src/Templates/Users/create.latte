@@ -1,0 +1,22 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>New user</h1>
+    <div class="card mb-3">
+        <div class="card-header">User info</div>
+        <div class="card-body">
+            <div class="d-flex align-items-start">
+                <img class="mr-2" src="/ava/new.jpeg" />
+                <div class="d-flex flex-column">
+                    <span><b>UUID:</b> <input type="text" value="(generated)" disabled /></span>
+                    <form method="POST" action="/users/@@">
+                        <p class="m-0"><b>Display name:</b> <input type="text" name="displayName" value="" required /></p>
+                        <p class="m-0"><b>Avatar URL:</b> <input type="text" name="avatarUrl" value="" placeholder="/ava/amogus.jpeg" required /></p>
+                        <p><b>Banned:</b> <input type="checkbox" name="isBanned" /></p>
+                        <input class="btn btn-primary" type="submit" name="act" value="Create" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

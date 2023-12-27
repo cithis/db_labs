@@ -1,0 +1,25 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>New tier</h1>
+    <div class="card mb-3">
+        <div class="card-header">Tier info</div>
+        <div class="card-body">
+            <div class="d-flex flex-column">
+                <form method="POST" action="/tiers/@@">
+                    <p class="m-0"><b>UUID:</b> <input type="text" value="(generated)" disabled /></p>
+                    <p class="m-0"><b>Creator:</b> <input type="text" name="creator" value="{$creator}" required /></p>
+                    <p class="m-0"><b>Title:</b> <input type="text" name="title" placeholder="Aboba tier" required /></p>
+                    <p class="m-0">
+                        <b>Price:</b>
+                        <input type="number" step="0.01" name="price" placeholder="13.37" />€
+                        (or <input type="checkbox" name="free" /> Free)
+                    </p>
+                    <p class="m-0"><b>Description:</b></p>
+                    <textarea name="description" placeholder="Lorem ipsum..." style="width: 100%;"></textarea>
+                    <p class="m-0"><input class="btn btn-primary" type="submit" name="act" value="Create" /></p>
+                </form>
+            </div>
+        </div>
+    </div>
+{/block}

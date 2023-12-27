@@ -1,0 +1,47 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>Users</h1>
+    <div class="row mt-4">
+        <div class="col-4">
+            <div class="card mr-2 mb-4">
+                <div class="card-header">Filter</div>
+                <div class="card-body">
+                    <form action="?page={$page}">
+                        <select name="include_banned">
+                            <option n:attr="selected: is_null($banned)" value="both">Include both banned and not</option>
+                            <option n:attr="selected: $banned" value="only">Only banned</option>
+                            <option n:attr="selected: $banned === false" value="only-not">Exclude banned</option>
+                        </select><br/><br/>
+                        <button class="btn btn-primary">Go</button>
+                    </form>
+                </div>
+            </div>
+
+            <a href="new" class="btn btn-primary">Add...</a>
+        </div>
+
+        <div class="col">
+            <div class="card mr-2">
+                <div class="card-header">Users</div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li n:foreach="$users as $user" class="list-group-item d-flex align-items-start">
+                            <img class="mr-2" src="{$user->getAvatarUrl()}" />
+                            <div>
+                                <h5><a href="/users/@{$user->getUuid()}">{$user->getDisplayName()}</a></h5>
+                                <div class="d-flex flex-column">
+                                    <span><b>UUID:</b> {$user->getUuid()}</span>
+                                    <span><b>Banned:</b> {$user->isBanned() ? 'Yes' : 'No'}</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    {include '../paginator.latte', page => $page, size => sizeof($users)}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

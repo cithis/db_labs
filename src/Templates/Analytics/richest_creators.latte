@@ -1,0 +1,42 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>Most spending users</h1>
+    <div class="row mt-4">
+        <div class="col-4">
+            <div class="card mr-2 mb-4">
+                <div class="card-header">Filter</div>
+                <div class="card-body">
+                    <form>
+                        <p><b>Only count subscriptions that expire after:</b> <input type="date" name="until" value="{$expiry->format('Y-m-d')}" /></p>
+                        <p><b>Minimum revenue:</b> <input type="number" name="minWealth" value="{$wealth}" />€</p>
+                        <select class="mb-4" name="include_banned">
+                            <option n:attr="selected: is_null($banned)" value="both">Include both banned and not</option>
+                            <option n:attr="selected: $banned" value="only">Only banned</option>
+                            <option n:attr="selected: $banned === false" value="only-not">Exclude banned</option>
+                        </select>
+                        <button class="btn btn-primary">Apply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card mr-2">
+                <div class="card-header">Creators</div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li n:foreach="$info as $userInfo" class="list-group-item d-flex flex-column">
+                            <span><b>Creator:</b> <a href="/creators/@{$userInfo->creatorNickname}">{$userInfo->creatorNickname}</a></span>
+                            <span><b>[!] Subscribers:</b> {$userInfo->subs}</span>
+                            <span><b>[!] Revenue:</b> {substr($userInfo->revenue, 1)}€</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    {include '../paginator.latte', page => $page, size => sizeof($info)}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

@@ -1,0 +1,47 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>Tiers</h1>
+    <div class="row mt-4">
+        <div class="col-4">
+            <div class="card mr-2 mb-4">
+                <div class="card-header">Filter</div>
+                <div class="card-body">
+                    <form action="?page={$page}">
+                        <p class="m-0"><b>Min. price:</b> <input type="number" step="0.01" name="price" value="{$price}" placeholder="13.37" />€</p>
+                        <select name="include_free">
+                            <option n:attr="selected: is_null($free)" value="both">Include both free and paid</option>
+                            <option n:attr="selected: $free" value="only">Only free</option>
+                            <option n:attr="selected: $free === false" value="only-not">Only paid</option>
+                        </select><br/><br/>
+                        <button class="btn btn-primary">Go</button>
+                    </form>
+                </div>
+            </div>
+
+            <a href="new" class="btn btn-primary">Add...</a>
+        </div>
+
+        <div class="col-7">
+            <div class="card mr-2">
+                <div class="card-header">Tiers</div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li n:foreach="$tiers as $tier" class="list-group-item d-flex flex-column">
+                            <h5>Tier <a href="/tiers/@{$tier->getUuid()}">{$tier->getTitle()}</a></h5>
+                            <p class="m-0"><b>UUID:</b> {$tier->getUuid()}</p>
+                            <p class="m-0"><b>Creator:</b> <a href="/creators/@{$tier->getCreator()}">{$tier->getCreator()}</a></p>
+                            <p class="m-0"><b>Price:</b> {$tier->getPrice() ?? 'Free'}</p>
+                            <p class="m-0"><b>Description:</b></p>
+                            <p class="m-0"><i>{$tier->getDescription()}</i></p>
+                            <p class="m-0 mt-2 text-muted"><b>Click the title to edit (or remove) this tier.</b></p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    {include '../paginator.latte', page => $page, size => sizeof($tiers)}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

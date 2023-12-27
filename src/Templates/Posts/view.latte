@@ -1,0 +1,47 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>Edit post</h1>
+    <form method="POST">
+        <div class="card mb-4">
+            <div class="card-header"><b>Post:</b> <input type="text" name="title" value="{$post->getTitle()}" /></div>
+            <div class="card-body">
+                <textarea name="content" placeholder="Lorem ipsum..." style="width: 100%; height: 50vh;">{$post->getContent()}</textarea>
+            </div>
+            <div class="card-footer">
+                <p class="m-0"><b>UUID:</b> <input type="text" value="{$post->getUuid()}" style="width: -webkit-fill-available;" disabled /></p>
+                <p class="m-0"><b>Creator:</b> <input type="text" name="creator" value="{$post->getCreator()}" style="width: -webkit-fill-available;" /></p>
+                <p class="m-0"><b>Actions:</b> <input class="btn btn-primary" type="submit" name="act" value="Save" /> <input class="btn btn-danger" type="submit" name="act" value="Delete" /></p>
+            </div>
+        </div>
+    </form>
+
+    <div class="card mb-4">
+        <div class="card-header">Tiers</div>
+        <div class="card-body">
+            <ul class="mb-4 list-group">
+                <li n:foreach="$tiers as $tier" class="list-group-item d-flex flex-column">
+                    <h5>Tier <a href="/tiers/@{$tier->getUuid()}">{$tier->getTitle()}</a></h5>
+                    <p class="m-0"><b>UUID:</b> {$tier->getUuid()}</p>
+                    <p class="m-0"><b>Creator:</b> <a href="/creators/@{$tier->getCreator()}">{$tier->getCreator()}</a></p>
+                    <p class="m-0"><b>Price:</b> {$tier->getPrice() ?? 'Free'}</p>
+                    <p class="m-0"><b>Description:</b></p>
+                    <p class="m-0"><i>{$tier->getDescription()}</i></p>
+                    <p class="mt-2 text-muted"><b>Click the title to edit (or remove) this tier.</b></p>
+                    <form method="POST" action="/posts/@{$post->getUuid()}/unbind/{$tier->getUuid()}">
+                        <input class="btn btn-danger" type="submit" name="act" value="Unbind" />
+                    </form>
+                </li>
+            </ul>
+
+            <form method="POST" action="/posts/@{$post->getUuid()}/bind">
+                <fieldset>
+                    <legend>Add to tier</legend>
+
+                    <p><b>Tier:</b> <input type="text" name="tier" /></p>
+                    <input class="btn btn-primary" type="submit" name="act" value="Save" />
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{/block}

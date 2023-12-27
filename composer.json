@@ -1,0 +1,15 @@
+{
+  "require": {
+    "nikic/fast-route": "*",
+    "ext-pdo": "*",
+    "ext-pdo_pgsql": "*",
+    "latte/latte": "*",
+    "jdenticon/jdenticon": "^1.0",
+    "ext-ctype": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>Octopus posts</h1>
+    <div class="row mt-4">
+        <div class="col-4">
+            <div class="card mr-2 mb-4">
+                <div class="card-header">Filter</div>
+                <div class="card-body">
+                    <form>
+                        <p><b>Name does not begin with:</b> <input type="text" name="blacklist" value="{$bl}" /></p>
+                        <p><b>Minimum length:</b> <input type="number" name="minLength" value="{$ml}" /></p>
+                        <button class="btn btn-primary">Apply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-7">
+            <div class="card mr-2">
+                <div class="card-header">Posts</div>
+                <div class="card-body">
+                    <div n:foreach="$octopi as [$post, $n]" class="card mb-2">
+                        <div class="card-header"><b>Post:</b> <a href="/posts/@{$post->getUuid()}">{$post->getTitle()}</a></div>
+                        <div class="card-body">
+                            <div class="alert alert-info">Is bound to <b>{$n}</b> tiers, has length of {strlen($post->getContent())} bytes.</div>
+                            <div style="max-height: 20vh; overflow-y: auto;">
+                                {$post->getContent()}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <p class="m-0"><b>UUID:</b> {$post->getUuid()}</p>
+                            <p class="m-0">
+                                <b>Creator:</b> <a href="/creators/@{$post->getCreator()}">{$post->getCreator()}</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    {include '../paginator.latte', page => $page, size => sizeof($octopi)}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

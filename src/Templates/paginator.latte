@@ -1,0 +1,5 @@
+<div class="d-flex justify-content-between">
+    <b><a n:if="$page != 1" href="?{http_build_query(array_merge($_GET, ['page' => ($page - 1)]), 'k', '&', PHP_QUERY_RFC3986)}">&laquo; Back</a></b>
+    <b>Page {$page}</b>
+    <b><a n:if="$size >= 10" href="?{http_build_query(array_merge($_GET, ['page' => ($page + 1)]), 'k', '&', PHP_QUERY_RFC3986)}">Next &raquo;</a></b>
+</div>

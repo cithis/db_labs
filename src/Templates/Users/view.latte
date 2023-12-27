@@ -1,0 +1,67 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>{$user->getDisplayName()}</h1>
+    <div class="card mb-3">
+        <div class="card-header">User info</div>
+        <div class="card-body">
+            <div class="d-flex align-items-start">
+                <img class="mr-2" src="{$user->getAvatarUrl()}" />
+                <div class="d-flex flex-column">
+                    <span><b>UUID:</b> {$user->getUuid()}</span>
+                    <form method="POST">
+                        <p class="m-0"><b>Display name:</b> <input type="text" name="displayName" value="{$user->getDisplayName()}" required /></p>
+                        <p class="m-0"><b>Avatar URL:</b> <input type="text" name="avatarUrl" value="{$user->getAvatarUrl()}" placeholder="/ava/amogus.jpeg" required /></p>
+                        <p class="m-0"><b>Banned:</b> <input n:attr="checked: $user->isBanned()" type="checkbox" name="isBanned" /></p>
+                        <p class="m-0"><b>Actions:</b> <input class="btn btn-primary" type="submit" name="act" value="Save" /> <input class="btn btn-danger" type="submit" name="act" value="Delete" /></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Subscriptions</div>
+        <div class="card-body">
+            <form>
+                <select name="include_expired">
+                    <option n:attr="selected: is_null($expr)" value="both">Include both expired and not</option>
+                    <option n:attr="selected: $expr" value="only">Only expired</option>
+                    <option n:attr="selected: $expr === false" value="only-not">Exclude expired</option>
+                </select>
+                <button class="btn btn-primary">Go</button>
+            </form>
+            <ul class="list-group">
+                <li n:foreach="$subs as $sub" class="list-group-item d-flex align-items-start">
+                    <img class="mr-2" src="{$sub->creator->getAvatarUrl()}" />
+                    <div>
+                        <h5>Tier <a href="/tiers/@{$sub->tier->getUuid()}">{$sub->tier->getTitle()}</a></h5>
+                        <div class="d-flex flex-column">
+                            <span><b>By:</b> <a href="/creators/@{$sub->creator->getNickname()}">{$sub->creator->getNickname()}</a></span>
+                            <form method="POST" action="/subs/@{$sub->tx}">
+                                <p class="m-0"><b>Expires:</b> <input type="date" name="expires" value="{$sub->expires->format('Y-m-d')}" /></p>
+                                <p class="m-0"><b>Actions:</b> <input class="btn btn-primary" type="submit" name="act" value="Save" /> <input class="btn btn-danger" type="submit" name="act" value="Delete" /></p>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="card-footer">
+            {include '../paginator.latte', page => $page, size => sizeof($subs)}
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Add subscription</div>
+        <div class="card-body">
+            <form method="POST" action="/subs/@@">
+                <p class="m-0"><b>Tx: <input type="number" name="tx" min="200000" max="400000" required /></b>
+                <p class="m-0"><b>Tier: <input type="text" name="tier" required /></b>
+                <p class="m-0"><b>Expires: <input type="date" name="expires" required /></p>
+                <input type="hidden" name="sponsor" value="{$user->getUuid()}" />
+                <input class="btn btn-primary" type="submit" name="act" value="Create" />
+            </form>
+        </div>
+    </div>
+{/block}

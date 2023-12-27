@@ -1,0 +1,82 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>Posts</h1>
+    <div class="row mt-4">
+        <div class="col-4">
+            <div class="card mr-2 mb-4">
+                <div class="card-header">Filter</div>
+                <div class="card-body">
+                    <form class="mb-4" action="/posts/feed">
+                        <fieldset>
+                            <legend>Feed filter</legend>
+
+                            <p><b>User:</b> <input type="text" name="user" value="{$user ?? ''}" /></p>
+                            <button class="btn btn-primary">Fetch feed</button>
+                        </fieldset>
+                    </form>
+
+                    <form action="/posts/feed/by-creator">
+                        <fieldset>
+                            <legend>Creator filter</legend>
+
+                            <p><b>Creator:</b> <input type="text" name="creator" value="{$creat ?? ''}" /></p>
+                            <button class="btn btn-primary">Fetch list</button>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+
+            <a href="new" class="btn btn-primary">Add...</a>
+        </div>
+
+        <div class="col-7">
+            <div class="card mr-2">
+                <div class="card-header">Posts</div>
+                <div class="card-body">
+                    <div n:foreach="$posts as $post_" class="card mb-2">
+                        {ifset $user}
+                            {var $post = $post_->post}
+                        {else}
+                            {ifset $creat}
+                                {var $post = $post_->post->post}
+                            {else}
+                                {var $post = $post_}
+                            {/ifset}
+                        {/ifset}
+
+                        <div class="card-header"><b>Post:</b> <a href="/posts/@{$post->getUuid()}">{$post->getTitle()}</a></div>
+                        <div class="card-body">
+                            {$post->getContent()}
+                        </div>
+                        <div class="card-footer">
+                            <p class="m-0"><b>UUID:</b> {$post->getUuid()}</p>
+                            <p class="m-0">
+                                {ifset $user}
+                                    {var $creatorId = $post_->creator->getNickname()}
+                                {else}
+                                    {ifset $creat}
+                                        {var $creatorId = $post_->post->creator->getNickname()}
+                                    {else}
+                                        {var $creatorId = $post->getCreator()}
+                                    {/ifset}
+                                {/ifset}
+
+                                <b>Creator:</b> <a href="/creators/@{$creatorId}">{$creatorId}</a>
+                                <div n:if="isset($creat)">
+                                    <b>Tiers:</b>
+                                    {foreach $post_->tiers as $tier}
+                                        <a href="/tiers/@{$tier->getUuid()}">{$tier->getTitle()}</a>&nbsp;
+                                    {/foreach}
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    {include '../paginator.latte', page => $page, size => sizeof($posts)}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

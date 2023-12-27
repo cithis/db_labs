@@ -1,0 +1,45 @@
+{extends "../@layout.latte"}
+
+{block content}
+    <h1>Most spending users</h1>
+    <div class="row mt-4">
+        <div class="col-4">
+            <div class="card mr-2 mb-4">
+                <div class="card-header">Filter</div>
+                <div class="card-body">
+                    <form>
+                        <p><b>Only count subscriptions that expire after:</b> <input type="date" name="expiry" value="{$expiry->format('Y-m-d')}" /></p>
+                        <p><b>Minimum spending:</b> <input type="number" name="minSpending" value="{$spend}" />€</p>
+                        <button class="btn btn-primary">Apply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card mr-2">
+                <div class="card-header">Users</div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li n:foreach="$users as $userInfo" class="list-group-item d-flex align-items-start">
+                            {var $user = $userInfo->user}
+                            <img class="mr-2" src="{$user->getAvatarUrl()}" />
+                            <div>
+                                <h5><a href="/users/@{$user->getUuid()}">{$user->getDisplayName()}</a></h5>
+                                <div class="d-flex flex-column">
+                                    <span><b>[!] Spending:</b> {$userInfo->spending}€</span>
+                                    <span><b>[!] Subscriptions:</b> {$userInfo->subscriptions}</span>
+                                    <span><b>UUID:</b> {$user->getUuid()}</span>
+                                    <span><b>Banned:</b> {$user->isBanned() ? 'Yes' : 'No'}</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    {include '../paginator.latte', page => $page, size => sizeof($users)}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
