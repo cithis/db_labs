@@ -5,7 +5,10 @@
     "ext-pdo_pgsql": "*",
     "latte/latte": "*",
     "jdenticon/jdenticon": "^1.0",
-    "ext-ctype": "*"
+    "ext-ctype": "*",
+    "illuminate/database": "^10.39",
+    "illuminate/pagination": "^10.39",
+    "ramsey/uuid": "^4.7"
   },
   "autoload": {
     "psr-4": {

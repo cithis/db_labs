@@ -2,65 +2,36 @@
 
 namespace App\Repositories;
 
-use App\Entities\Creator;
+use App\Model\CreatorModel;
 
 class CreatorRepository extends AbstractRepository
 {
-    public function getByNickname(string $nickname): Creator
+    public function getByNickname(string $nickname): CreatorModel
     {
-        $stmt = $this->db->prepare("SELECT * FROM \"Creators\" WHERE nickname = ?");
-        $stmt->execute([$nickname]);
-        
-        if ($stmt->rowCount() == 0)
-            throw new \RuntimeException("Object not found");
-        
-        return $stmt->fetchObject(Creator::class);
+        return CreatorModel::findOrFail($nickname);
     }
     
     public function dropByNickname(string $nickname): bool
     {
-        $stmt = $this->db->prepare("DELETE FROM \"Creators\" WHERE \"nickname\" = ?");
-        $stmt->execute([$nickname]);
-        
-        return $stmt->rowCount() != 0;
+        return CreatorModel::destroy($nickname) != 0;
     }
     
     public function fetch(int $page = 1, ?bool $isBanned = NULL, $perPage = 10): array
     {
-        $params = [];
-        $query  = "SELECT * FROM \"Creators\"";
-        if (!is_null($isBanned)) {
-            $query   .= " WHERE \"isBanned\" = ?::boolean";
-            $params[] = bool2str($isBanned);
-        }
+        $creators = CreatorModel::query();
+        if (!is_null($isBanned))
+            $creators = $creators->where('isBanned', $isBanned);
     
-        $offset = ($page - 1) * $perPage;
-        $stmt   = $this->db->prepare("$query LIMIT $perPage OFFSET $offset");
-        $stmt->execute($params);
+        $offset   = ($page - 1) * $perPage;
+        $creators = $creators->offset($offset)->limit($perPage)->get();
         
-        return $stmt->fetchAll(\PDO::FETCH_CLASS, Creator::class);
+        return iterator_to_array($creators);
     }
     
-    public function save(Creator $user): string
+    public function save(CreatorModel $user): string
     {
-        $stmt = $this->db->prepare(<<<'EOQ'
-            INSERT INTO "Creators" VALUES (?, ?, ?, ?::boolean) ON CONFLICT (nickname) DO UPDATE
-                SET "displayName" = ?, "avatarUrl" = ?, "isBanned" = ?::boolean
-            RETURNING nickname
-EOQ,    );
-        $stmt->execute([
-            $user->getNickname(),
-            $user->getDisplayName(),
-            $user->getAvatarUrl(),
-            bool2str($user->isBanned()),
-            $user->getDisplayName(),
-            $user->getAvatarUrl(),
-            bool2str($user->isBanned()),
-        ]);
+        $user->saveOrFail();
         
-        if ($stmt->rowCount() == 0)
-            throw new \RuntimeException("Object was not inserted");
-        
-        return $stmt->fetchColumn();
+        return $user->nickname;
     }
 }

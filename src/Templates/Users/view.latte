@@ -1,18 +1,18 @@
 {extends "../@layout.latte"}
 
 {block content}
-    <h1>{$user->getDisplayName()}</h1>
+    <h1>{$user->displayName}</h1>
     <div class="card mb-3">
         <div class="card-header">User info</div>
         <div class="card-body">
             <div class="d-flex align-items-start">
-                <img class="mr-2" src="{$user->getAvatarUrl()}" />
+                <img class="mr-2" src="{$user->avatarUrl}" />
                 <div class="d-flex flex-column">
-                    <span><b>UUID:</b> {$user->getUuid()}</span>
+                    <span><b>UUID:</b> {$user->UUID}</span>
                     <form method="POST">
-                        <p class="m-0"><b>Display name:</b> <input type="text" name="displayName" value="{$user->getDisplayName()}" required /></p>
-                        <p class="m-0"><b>Avatar URL:</b> <input type="text" name="avatarUrl" value="{$user->getAvatarUrl()}" placeholder="/ava/amogus.jpeg" required /></p>
-                        <p class="m-0"><b>Banned:</b> <input n:attr="checked: $user->isBanned()" type="checkbox" name="isBanned" /></p>
+                        <p class="m-0"><b>Display name:</b> <input type="text" name="displayName" value="{$user->displayName}" required /></p>
+                        <p class="m-0"><b>Avatar URL:</b> <input type="text" name="avatarUrl" value="{$user->avatarUrl}" placeholder="/ava/amogus.jpeg" required /></p>
+                        <p class="m-0"><b>Banned:</b> <input n:attr="checked: $user->isBanned" type="checkbox" name="isBanned" /></p>
                         <p class="m-0"><b>Actions:</b> <input class="btn btn-primary" type="submit" name="act" value="Save" /> <input class="btn btn-danger" type="submit" name="act" value="Delete" /></p>
                     </form>
                 </div>
@@ -59,7 +59,7 @@
                 <p class="m-0"><b>Tx: <input type="number" name="tx" min="200000" max="400000" required /></b>
                 <p class="m-0"><b>Tier: <input type="text" name="tier" required /></b>
                 <p class="m-0"><b>Expires: <input type="date" name="expires" required /></p>
-                <input type="hidden" name="sponsor" value="{$user->getUuid()}" />
+                <input type="hidden" name="sponsor" value="{$user->UUID}" />
                 <input class="btn btn-primary" type="submit" name="act" value="Create" />
             </form>
         </div>

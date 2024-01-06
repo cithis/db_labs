@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entities\Creator;
 use App\Entities\Tier;
+use App\Model\SubscriptionModel;
 use App\Services\DataObjects\Subscription;
 use App\Services\DataObjects\SubscriptionInfo;
 
@@ -16,45 +17,40 @@ class SubscriptionService
         $this->db = $db;
     }
     
-    public function getByTxId(int $tx): Subscription
+    public function getByTxId(int $tx): SubscriptionModel
     {
-        $stmt = $this->db->prepare("SELECT ?, tier, expires FROM \"Subscriptions\" WHERE \"transaction\" = ?");
-        $stmt->execute([$tx, $tx]);
-    
-        if ($stmt->rowCount() == 0)
-            throw new \RuntimeException("Object not found");
-    
-        return $stmt->fetchObject(Subscription::class);
+        return SubscriptionModel::findOrFail($tx);
     }
     
     public function dropByTxId(int $tx): bool
     {
-        $stmt = $this->db->prepare("DELETE FROM \"Subscriptions\" WHERE \"transaction\" = ?");
-        $stmt->execute([$tx]);
-        
-        return $stmt->rowCount() != 0;
+        return SubscriptionModel::destroy($tx) != 0;
     }
     
     public function updateExpirationByTxId(int $tx, \DateTime $dt): bool
     {
-        $stmt = $this->db->prepare("UPDATE \"Subscriptions\" SET expires = ? WHERE \"transaction\" = ?");
-        $stmt->execute([$dt->format('Y-m-d H:i:s'), $tx]);
-    
-        return $stmt->rowCount() != 0;
+        $sub = $this->getByTxId($tx);
+        $sub->expires = $dt;
+        
+        return $sub->saveQuietly();
     }
     
     public function subscribe(string $user, string $tier, \DateTime $expires, int $tx): bool
     {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM \"Subscriptions\" WHERE sponsor = ? AND expires > CURRENT_TIMESTAMP");
-        $stmt->execute([$user]);
+        $sub = SubscriptionModel::where('sponsor', '=', $user)
+            ->where('tier', '=', $tier)
+            ->where('expires', '>=', date('Y-m-d H:i:s', time()))->first();
         
-        if ($stmt->fetchColumn(0) != 0)
-            return false; # Record already exists
+        if (!is_null($sub))
+            return false;
         
-        $stmt = $this->db->prepare("INSERT INTO \"Subscriptions\" VALUES (?, ?, ?, ?)");
-        $stmt->execute([$user, $tier, $expires->format('Y-m-d H:i:s'), $tx]);
+        $sub = new SubscriptionModel;
+        $sub->transaction = $tx;
+        $sub->sponsor     = $user;
+        $sub->tier        = $tier;
+        $sub->expires     = $expires->format('Y-m-d H:i:s');
         
-        return $stmt->rowCount() != 0;
+        return $sub->saveQuietly();
     }
     
     public function getSubscriptions(

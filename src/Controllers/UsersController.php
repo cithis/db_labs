@@ -2,38 +2,39 @@
 
 namespace App\Controllers;
 
-use App\Entities\User;
-use App\Repositories\UserRepository;
+use App\Model\UserModel;
 use App\Services\SubscriptionService;
+use Illuminate\Contracts\Pagination\Paginator;
 
 final class UsersController extends AbstractController
 {
-    protected UserRepository $users;
     protected SubscriptionService $subs;
     
     function __construct(\PDO $database)
     {
         parent::__construct($database);
         
-        $this->users = new UserRepository($database);
-        $this->subs  = new SubscriptionService($database);
+        $this->subs = new SubscriptionService($database);
     }
     
     public function enumerate(): void
     {
         $banned = $this->boolSelect('include_banned', ['only', 'only-not']);
-    
+        $users  = UserModel::query();
+        if (!is_null($banned))
+            $users = $users->where('isBanned', $banned);
+        
         $this->render('Users/list.latte', [
-            'users'  => $this->users->fetch($page = $this->getPage(), $banned),
+            'users'  => iterator_to_array($users->paginate(10)),
             'banned' => $banned,
-            'page'   => $page,
+            'page'   => $this->getPage(),
         ]);
     }
     
     public function view(string $id): void
     {
         $user = $this->catchNotFound(
-            fn () => $this->users->getByUUID($id),
+            fn () => UserModel::findOrFail($id),
             \RuntimeException::class
         );
         
@@ -51,32 +52,32 @@ final class UsersController extends AbstractController
     public function edit(string $id): void
     {
         if ($_POST['act'] === 'Create') {
-            $user = new User;
+            $user = new UserModel;
         } else {
             $user = $this->catchNotFound(
-                fn () => $this->users->getByUUID($id),
+                fn () => UserModel::findOrFail($id),
                 \RuntimeException::class
             );
-    
+            
             if ($_POST['act'] === 'Delete') {
-                $this->users->dropByUUID($id);
+                $user->delete();
                 $this->addFlash('success', 'User removed');
                 $this->redirect('/users/list');
             }
         }
-        
-        $user->setDisplayName($_POST['displayName'] ?? $user->getDisplayName());
-        $user->setAvatarUrl($_POST['avatarUrl'] ?? $user->getDisplayName());
-        $user->setIsBanned(($_POST['isBanned'] ?? 'off') === 'on');
+    
+        $user->displayName = $_POST['displayName'] ?? $user->displayName;
+        $user->avatarUrl   = $_POST['avatarUrl'] ?? $user->avatarUrl;
+        $user->isBanned    = ($_POST['isBanned'] ?? 'off') == 'on';
         
         try {
-            $id = $this->users->save($user);
-            $this->addFlash('success', 'User saved');
-        } catch (\PDOException $ex) {
-            $this->addFlash('danger', 'PostgreSQL returned error: ' . $ex->getMessage());
+            $user->saveOrFail();
+            $id = $user->UUID;
+        } catch (\Throwable $e) {
+            $this->addFlash('danger', 'PostgreSQL returned error: ' . $e->getMessage());
             $this->back();
         }
-        
+    
         $this->redirect("/users/@$id");
     }
     

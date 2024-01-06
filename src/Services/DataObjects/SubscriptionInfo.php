@@ -14,8 +14,8 @@ class SubscriptionInfo
     
     public function __construct(int $tx, Tier $tier, Creator $creator, \DateTime $expires)
     {
-        $this->tx = $tx;
-        $this->tier = $tier;
+        $this->tx      = $tx;
+        $this->tier    = $tier;
         $this->creator = $creator;
         $this->expires = $expires;
     }

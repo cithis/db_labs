@@ -14,6 +14,7 @@ final class HomeController extends AbstractController
     function identicon(string $seed): void
     {
         header('Cache-Control: max-age=3600');
+        header('Expires: Thu, 19 Nov 2077 08:52:00 GMT');
         
         $ico = new Identicon;
         $ico->setValue($seed);

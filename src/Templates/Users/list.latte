@@ -27,12 +27,12 @@
                 <div class="card-body">
                     <ul class="list-group">
                         <li n:foreach="$users as $user" class="list-group-item d-flex align-items-start">
-                            <img class="mr-2" src="{$user->getAvatarUrl()}" />
+                            <img class="mr-2" src="{$user->avatarUrl}" />
                             <div>
-                                <h5><a href="/users/@{$user->getUuid()}">{$user->getDisplayName()}</a></h5>
+                                <h5><a href="/users/@{$user->UUID}">{$user->displayName}</a></h5>
                                 <div class="d-flex flex-column">
-                                    <span><b>UUID:</b> {$user->getUuid()}</span>
-                                    <span><b>Banned:</b> {$user->isBanned() ? 'Yes' : 'No'}</span>
+                                    <span><b>UUID:</b> {$user->UUID}</span>
+                                    <span><b>Banned:</b> {$user->isBanned ? 'Yes' : 'No'}</span>
                                 </div>
                             </div>
                         </li>
